@@ -63,6 +63,26 @@ class H5ADTests(unittest.TestCase):
             cfg=self.config(); cfg['counts_provenance']={'kind':'sct','evidence_ref':'wrong'}
             with self.assertRaises(ValueError): load_h5ad(path,cfg)
 
+    def test_measured_transcripts_are_spatial_counts_not_rna_umis(self):
+        import numpy as np
+        from ftd_prediction.h5ad_io import load_h5ad
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / 'xenium_fixture.h5ad'
+            original = self.fixture(path)
+            cfg = self.config()
+            cfg['counts_provenance'] = {
+                'kind': 'measured_transcripts',
+                'evidence_ref': 'invented-decoded-transcript-assignment-record'}
+            with self.assertRaisesRegex(ValueError, 'count provenance'):
+                load_h5ad(path, cfg)
+            cfg.update(assay='spatial', coordinate_units='um', spatial_key='spatial')
+            cfg['obs_columns']['section_id'] = 'section'
+            loaded = load_h5ad(path, cfg)
+            np.testing.assert_array_equal(
+                loaded.layers['counts'].toarray(), original.layers['counts'].toarray())
+            self.assertEqual(loaded.uns['ftd_input']['counts_provenance']['kind'],
+                             'measured_transcripts')
+
     def test_query_donor_changes_do_not_change_training_sample(self):
         from ftd_prediction.h5ad_io import load_h5ad
         with tempfile.TemporaryDirectory() as root:
@@ -93,6 +113,73 @@ class H5ADTests(unittest.TestCase):
             self.assertEqual(load_h5ad(path,cfg).obsm['spatial'].shape,(8,2))
             cfg['cell_cap_per_donor']=2
             with self.assertRaises(ValueError): load_h5ad(path,cfg)
+
+    def test_required_identities_reject_nulls_and_case_whitespace_marker_variants(self):
+        import numpy as np
+        import pandas as pd
+        from ftd_prediction.h5ad_io import load_h5ad
+        markers = [None, np.nan, pd.NA, '', ' \t ']
+        for word in ('unknown', 'unresolved', 'null', 'none', 'nan', 'NA', 'unavailable',
+                     '__unavailable__', 'conflicting', 'not_applicable', 'restricted'):
+            markers.extend([word, word.upper(), f' \t{word.title()}\n'])
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / 'a.h5ad'
+            a = self.fixture(path)
+            original = a.obs.copy()
+            for column in ('donor', 'section'):
+                for marker in markers:
+                    a.obs = original.copy()
+                    a.obs[column] = pd.Categorical([marker] + original[column].tolist()[1:])
+                    a.write_h5ad(path)
+                    scopes = [('spatial', False), ('spatial', True)]
+                    if column == 'donor':
+                        scopes.append(('rna', False))
+                    for assay, graph in scopes:
+                        cfg = self.config()
+                        if assay == 'spatial':
+                            cfg.update(assay='spatial', coordinate_units='um', spatial_key='spatial')
+                            cfg['obs_columns']['section_id'] = 'section'
+                        if graph:
+                            cfg['spatial_graph'] = dict(radius_um=2, max_neighbors=1)
+                        with self.subTest(column=column, marker=repr(marker), assay=assay, graph=graph), \
+                                patch('anndata.io.sparse_dataset', side_effect=AssertionError('count allocation')):
+                            with self.assertRaisesRegex(ValueError, 'unresolved'):
+                                load_h5ad(path, cfg)
+
+    def test_crosswalk_required_identities_reject_missing_markers(self):
+        from ftd_prediction.h5ad_io import load_h5ad
+        with tempfile.TemporaryDirectory() as root:
+            root = Path(root); path = root / 'a.h5ad'; self.fixture(path)
+            mapping = root / 'mapping.csv'
+            cfg = self.config()
+            cfg.update(assay='spatial', coordinate_units='um', spatial_key='spatial',
+                       mapping_file=str(mapping), mapping_keys=['sample_id'])
+            cfg['obs_columns'] = {'sample_id': 'donor', 'cell_type': 'types'}
+            for column in ('donor_id', 'section_id'):
+                for marker in ('NA', 'NaN', 'NULL', 'NoNe', 'Unknown', 'Unresolved', 'UNAVAILABLE'):
+                    donor, section = (marker, 'physical1') if column == 'donor_id' else ('p1', marker)
+                    mapping.write_text(f'sample_id,donor_id,section_id\nd1,{donor},{section}\nd2,p2,physical2\n')
+                    with self.subTest(column=column, marker=marker):
+                        with self.assertRaisesRegex(ValueError, 'unresolved'):
+                            load_h5ad(path, cfg)
+
+    def test_valid_identity_strings_are_preserved_without_inferred_replacements(self):
+        from ftd_prediction.h5ad_io import load_h5ad
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / 'a.h5ad'; a = self.fixture(path)
+            donors = ['Unknown-donor'] * 4 + ['NA-2'] * 4
+            sections = ['None-section'] * 4 + ['nan-section'] * 4
+            a.obs['donor'] = donors; a.obs['section'] = sections
+            a.write_h5ad(path)
+            cfg = self.config()
+            cfg.update(assay='spatial', coordinate_units='um', spatial_key='spatial')
+            cfg['obs_columns']['section_id'] = 'section'
+            for graph in (False, True):
+                if graph:
+                    cfg['spatial_graph'] = dict(radius_um=2, max_neighbors=1)
+                loaded = load_h5ad(path, cfg)
+                self.assertEqual(loaded.obs.donor_id.tolist(), donors)
+                self.assertEqual(loaded.obs.section_id.tolist(), sections)
 
     def test_memory_bound_and_external_links_rejected(self):
         import h5py
@@ -133,6 +220,27 @@ class H5ADTests(unittest.TestCase):
             self.assertEqual(a.obs.section_id.tolist(),['physical1']*4+['physical2']*4)
             mapping.write_text('sample_id,acquisition_region,donor_id,section_id\nd1,s1,p1,shared\nd2,s2,p2,shared\n')
             with self.assertRaisesRegex(ValueError,'multiple donors'):load_h5ad(path,cfg)
+
+    def test_authoritative_crosswalk_adds_region_without_overwriting_metadata(self):
+        from ftd_prediction.h5ad_io import load_h5ad
+        from ftd_prediction.provenance import file_sha256
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / 'invented.h5ad'
+            self.fixture(source)
+            source_hash = file_sha256(source)
+            mapping = root / 'mapping.csv'
+            mapping.write_text('sample_id,donor_id,retinal_region\nd1,p1,central\nd2,p1,peripheral\n')
+            cfg = self.config()
+            cfg.update(obs_columns={'sample_id': 'donor', 'cell_type': 'types'},
+                       mapping_file=str(mapping), mapping_keys=['sample_id'])
+            result = load_h5ad(source, cfg)
+            self.assertEqual(result.obs.retinal_region.tolist(), ['central'] * 4 + ['peripheral'] * 4)
+            self.assertEqual(result.obs.donor_id.tolist(), ['p1'] * 8)
+            self.assertEqual(file_sha256(source), source_hash)
+            cfg['obs_columns']['retinal_region'] = 'section'
+            with self.assertRaisesRegex(ValueError, 'replace existing'):
+                load_h5ad(source, cfg)
 
 
 if __name__ == '__main__': unittest.main()

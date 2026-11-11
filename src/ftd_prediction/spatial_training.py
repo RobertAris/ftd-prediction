@@ -21,7 +21,7 @@ import numpy as np
 _DEFAULTS = dict(mode="frozen", seed=11, max_epochs=10, batch_size=256,
                  num_workers=0, max_minutes=45.0, accelerator="cpu",
                  radius_um=18.0, domain_level=7, max_genes=2000,
-                 learning_rate=1e-4, num_threads=1)
+                 learning_rate=1e-4, num_threads=1, checkpoint_compatibility="strict")
 _MISSING = {"", "unknown", "unresolved", "conflicting", "none", "null", "nan",
             "not_applicable", "restricted"}
 
@@ -60,6 +60,12 @@ def _validate(adata, config):
     if set(config) - allowed:
         raise ValueError("Unsupported spatial configuration keys")
     cfg = {**_DEFAULTS, **config}
+    from .novae_checkpoint import COMPATIBILITY, reject_image_input, validate_compatibility
+    validate_compatibility(cfg["checkpoint_compatibility"])
+    if cfg["checkpoint_compatibility"] == COMPATIBILITY:
+        reject_image_input(adata)
+        if cfg["mode"] == "synthetic_smoke":
+            raise ValueError("Checkpoint compatibility requires an external frozen/fine_tune checkpoint")
     if cfg["mode"] not in ("synthetic_smoke", "frozen", "fine_tune"):
         raise ValueError("Unsupported spatial mode")
     for key, lo, hi in (("seed", 0, 2**32 - 1), ("max_epochs", 1, 1000),
@@ -446,10 +452,13 @@ def _execute(adata, cfg, counts, train_mask, output, started):
     L.seed_everything(cfg["seed"], workers=True, verbose=False)
     model = None
     checkpoint_hashes = None
+    compatibility_receipt = None
     if cfg["mode"] != "synthetic_smoke":
+        from .novae_checkpoint import load_expression_checkpoint
         path = Path(cfg["checkpoint_path"])
         checkpoint_hashes = {name: _file_hash(path / name) for name in ("config.json", "model.safetensors")}
-        model = novae.Novae.from_pretrained(path, local_files_only=True, map_location="cpu", strict=True)
+        model, compatibility_receipt = load_expression_checkpoint(
+            path, cfg["checkpoint_compatibility"], adata=adata)
         if model.cell_embedder is None or model.hparams.embedding_name is not None:
             raise ValueError("This backend requires an expression checkpoint")
         model.hparams.batch_size = cfg["batch_size"]
@@ -545,7 +554,8 @@ def _execute(adata, cfg, counts, train_mask, output, started):
                                        "donor_id": s.obs["donor_id"].iloc[0],
                                        "component": s.obs["tissue_component"].iloc[0] if "tissue_component" in s.obs else None,
                                        "cells": s.n_obs} for s in artifact_sections],
-                  "checkpoint_hashes": checkpoint_hashes, "encoder_before": encoder_before,
+                  "checkpoint_hashes": checkpoint_hashes,
+                  "checkpoint_compatibility": compatibility_receipt, "encoder_before": encoder_before,
                   "encoder_after": encoder_after, "prototypes_before": prototypes_before,
                   "prototypes_after": prototypes_after, "scratch": scratch_evidence,
                   "domain_level": cfg["domain_level"],
@@ -559,6 +569,7 @@ def _execute(adata, cfg, counts, train_mask, output, started):
     _write_json(output / "training_history.json", histories)
     _check_time(deadline)
     result = dict(method="novae", status="completed", mode=cfg["mode"],
+                  checkpoint_compatibility=compatibility_receipt,
                   train_donors=cfg["train_donors"], test_donors=cfg["test_donors"],
                   selected_genes=list(adata.var_names[selected]), encoder_updated=updated,
                   reload_verified=True, training_steps=sum(h["training_steps"] for h in histories),

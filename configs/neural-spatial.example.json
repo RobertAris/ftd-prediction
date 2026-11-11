@@ -9,8 +9,8 @@
   ],
   "count_source": "layers/REPLACE_WITH_VERIFIED_COUNTS_LAYER",
   "counts_provenance": {
-    "kind": "measured_umi",
-    "evidence_ref": "REPLACE_WITH_LOCAL_PREPROCESSING_RECORD"
+    "kind": "measured_transcripts",
+    "evidence_ref": "REPLACE_WITH_XOA_TRANSCRIPT_QUALITY_AND_CELL_ASSIGNMENT_RECORD"
   },
   "mapping_verified": false,
   "mapping_evidence_ref": "",
@@ -39,7 +39,8 @@
     "radius_um": 18.0,
     "domain_level": 7,
     "max_genes": 2000,
-    "learning_rate": 0.0001
+    "learning_rate": 0.0001,
+    "checkpoint_compatibility": "novae-human-0-expression-v1"
   },
   "coordinate_units": "UNVERIFIED",
   "spatial_key": "spatial",

@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "data_kind": "study",
+  "assay": "spatial",
+  "input_file": "/REPLACE_WITH_APPROVED_CANONICAL_FILE.h5ad",
+  "canonical_input_roots": [
+    "/REPLACE_WITH_APPROVED_CANONICAL_ROOT",
+    "/REPLACE_WITH_PRIVATE_MAPPING_DIRECTORY"
+  ],
+  "count_source": "layers/REPLACE_WITH_VERIFIED_COUNTS_LAYER",
+  "counts_provenance": {
+    "kind": "measured_transcripts",
+    "evidence_ref": "REPLACE_WITH_XOA_TRANSCRIPT_QUALITY_AND_CELL_ASSIGNMENT_RECORD"
+  },
+  "mapping_verified": false,
+  "mapping_evidence_ref": "",
+  "obs_columns": {
+    "sample_id": "REPLACE_WITH_VERIFIED_SAMPLE_COLUMN",
+    "acquisition_region": "REPLACE_WITH_VERIFIED_ACQUISITION_REGION_COLUMN",
+    "retinal_region": "REPLACE_WITH_VERIFIED_RETINAL_REGION_COLUMN",
+    "cell_type": "REPLACE_WITH_VERIFIED_CELL_TYPE_COLUMN"
+  },
+  "mapping_file": "/REPLACE_WITH_PRIVATE_MAPPING_DIRECTORY/verified_mapping.csv",
+  "mapping_keys": ["sample_id", "acquisition_region"],
+  "coordinate_units": "UNVERIFIED",
+  "spatial_key": "REPLACE_WITH_VERIFIED_COORDINATE_KEY",
+  "panel_ref": "REPLACE_WITH_PANEL_VERSION",
+  "segmentation_ref": "REPLACE_WITH_ONE_SEGMENTATION_VARIANT",
+  "coordinate_transform_ref": "REPLACE_WITH_COORDINATE_PROVENANCE",
+  "shared_preprocessing_scope": "unverified",
+  "source_version": "REPLACE_WITH_PREPROCESSING_VERSION",
+  "seed": 11,
+  "max_source_cells": 2000000,
+  "max_cells": 500000,
+  "max_genes": 100000,
+  "max_matrix_bytes": 4294967296
+}

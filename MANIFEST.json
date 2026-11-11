@@ -1,0 +1,315 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "3a8c3681ca55c53b2070ccfdbabdddad55f0f3bacccf044f2dc67ed60d6450bf",
+      "size_bytes": 2257
+    },
+    {
+      "path": "configs/descriptive-rna.example.json",
+      "sha256": "94f8b8ca4a1489470503c54f60c1a9b74b48bdb538e9ed7e366c33b22d0a46cc",
+      "size_bytes": 1009
+    },
+    {
+      "path": "configs/descriptive-spatial.example.json",
+      "sha256": "bacc079d38eb9398525d2a5bdc8abfbb637d621d7a1c557ed3d5c521fe802567",
+      "size_bytes": 1451
+    },
+    {
+      "path": "configs/molecular-contrast.example.json",
+      "sha256": "1daf544b89f0d5fea3ddbb510e477dd9a9a817fd722f21d67e171624d3d8de58",
+      "size_bytes": 936
+    },
+    {
+      "path": "configs/neural-rna.example.json",
+      "sha256": "30bb74c89d10c634c905f00574e3b0317dc6a6f7a28477a2949605d2333e95c3",
+      "size_bytes": 1328
+    },
+    {
+      "path": "configs/neural-spatial.example.json",
+      "sha256": "0dc99fc71bed4e3f328792b5341a9ee56c85397b9551395b7dfaa59f6f68cd39",
+      "size_bytes": 1736
+    },
+    {
+      "path": "configs/pmacs.example.json",
+      "sha256": "95bef8de3fe64765c43b04099a27e92484d94518dc786519025a940b53a84c51",
+      "size_bytes": 930
+    },
+    {
+      "path": "docs/implementation/descriptive-report.md",
+      "sha256": "3fa5f619b3150db1bb0b7b2a4a3ebcd7eb20852568a5c5a9525d38dc0498b13c",
+      "size_bytes": 3079
+    },
+    {
+      "path": "docs/implementation/descriptive-runner.md",
+      "sha256": "67f3ab5ed2a7741937ddddd5d483ba8ffa7026449e1f58204343584622232c70",
+      "size_bytes": 9538
+    },
+    {
+      "path": "docs/implementation/molecular-runbook.md",
+      "sha256": "e5bfc80b7009455e1b7b7410a72d826d690d7aa65e97dfee8f9944c382c4c76c",
+      "size_bytes": 6898
+    },
+    {
+      "path": "docs/implementation/novae-human0-compatibility.md",
+      "sha256": "12a1d3ca2f22b0792eed6b3a18a20e392a2753ead460ee708a9992d4d59d1047",
+      "size_bytes": 3833
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "08986c939d74d35861a9e5158afda58f5ec2e8e4539f75bc9ceaf2cd6490a534",
+      "size_bytes": 404
+    },
+    {
+      "path": "scripts/h5ad_schema_probe.py",
+      "sha256": "7a58bd6da22615b4fcbadfa361fcc78a4795dfa6bd48cc3b82f523dd76f6d137",
+      "size_bytes": 1463
+    },
+    {
+      "path": "scripts/inline_h5ad_counts_probe.py",
+      "sha256": "d298a5dd70e4bdd5049217c8751f8781eeff734ed3309cb56a5b30d94d6fec5c",
+      "size_bytes": 1883
+    },
+    {
+      "path": "scripts/inline_h5ad_schema_flat.py",
+      "sha256": "486bad698763ecaa9dd96d5a57c99c708a0db45d9e9851dbe75c0b8983df52b1",
+      "size_bytes": 1006
+    },
+    {
+      "path": "scripts/inspect_formats.py",
+      "sha256": "0e1fee14942975570959683dead3adbe7ba7ab24cf07e13bf6f884daf7e574ef",
+      "size_bytes": 10191
+    },
+    {
+      "path": "scripts/neural_synthetic_check.py",
+      "sha256": "f675d8a9efd5bcc9e1691d7d6e5b1c358b92d2519ebc72e1c76fd20f0cda0ef4",
+      "size_bytes": 3150
+    },
+    {
+      "path": "scripts/pmacs_discover_inputs.py",
+      "sha256": "c0c8eb1fdc6534a6c1665984cd4a5de613ffd85ed32940ac1f6c3dbf7e33f37e",
+      "size_bytes": 19078
+    },
+    {
+      "path": "src/ftd_prediction/__init__.py",
+      "sha256": "7a7d7bf029db12285218060adcb66d8de0816804c167aee551f359544146cc20",
+      "size_bytes": 95
+    },
+    {
+      "path": "src/ftd_prediction/__main__.py",
+      "sha256": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "size_bytes": 48
+    },
+    {
+      "path": "src/ftd_prediction/cli.py",
+      "sha256": "b53490403095ef0d6d343fc280bca36b989a7fd52a402db26c1e9797876b1cd4",
+      "size_bytes": 26191
+    },
+    {
+      "path": "src/ftd_prediction/cluster.py",
+      "sha256": "8c5ded22e985600f32a96ad848b8902e45dc17e5b62f22ec09e8535901bc317c",
+      "size_bytes": 9865
+    },
+    {
+      "path": "src/ftd_prediction/contracts.py",
+      "sha256": "f38348336905d93ca1d74c4d6213b5cf6bbc66a5e866c339a00e975f0b34dd4d",
+      "size_bytes": 8360
+    },
+    {
+      "path": "src/ftd_prediction/data.py",
+      "sha256": "ffd2703f24751e20d0ff16d13b36066b3d7d028834f23fc0ee75ff4a54b31e32",
+      "size_bytes": 11384
+    },
+    {
+      "path": "src/ftd_prediction/descriptive.py",
+      "sha256": "d261210c80affe7021a89de77609e02bb0645dfd761bd5daad6b11e45b14ace4",
+      "size_bytes": 15143
+    },
+    {
+      "path": "src/ftd_prediction/descriptive_report.py",
+      "sha256": "73e20ea41173e9f4a25523d70d3261bb2d0d38cd5e04cfb1b1699012e26e1f85",
+      "size_bytes": 36803
+    },
+    {
+      "path": "src/ftd_prediction/h5ad_io.py",
+      "sha256": "b24fdfe8dde2886ce912a5d95e569642a00f0fc95118527a17b1fa2083c63e5b",
+      "size_bytes": 16036
+    },
+    {
+      "path": "src/ftd_prediction/molecular.py",
+      "sha256": "57cdf52cc24fff914dd27f81125c2656a12c7b8876af0e285e261bcd50b01107",
+      "size_bytes": 36557
+    },
+    {
+      "path": "src/ftd_prediction/neural.py",
+      "sha256": "43bb4e8a072546d4f93b01514fd3a84ca38c3f17a666e5926e42d861e9bc33c7",
+      "size_bytes": 14166
+    },
+    {
+      "path": "src/ftd_prediction/neural_report.py",
+      "sha256": "731937d8c539a30e64fef19b04adc5fe021cb2f3c2ebdc10b56b62a2f9a30cbc",
+      "size_bytes": 19891
+    },
+    {
+      "path": "src/ftd_prediction/novae_checkpoint.py",
+      "sha256": "e8010523143fb86c669cd05c33b2e1b9ef1ac7d20878c68a250e573bf736eed6",
+      "size_bytes": 9499
+    },
+    {
+      "path": "src/ftd_prediction/pmacs_ready.py",
+      "sha256": "846223b7906f0fcd3b7e4644d996c8161d9d460a84bbe4079bb517e279225413",
+      "size_bytes": 24813
+    },
+    {
+      "path": "src/ftd_prediction/provenance.py",
+      "sha256": "a8a35bc2c63f013ae9ae3186fea8d2626ed623aae8ee770dc4c5e3bd8f400a30",
+      "size_bytes": 4121
+    },
+    {
+      "path": "src/ftd_prediction/reference.py",
+      "sha256": "f732c66c2238f07ada34017b34cbf806dfd83269428e3ae7f5978c2aa4f0be63",
+      "size_bytes": 15235
+    },
+    {
+      "path": "src/ftd_prediction/reporting.py",
+      "sha256": "e422a40519a55fc6c6c0eea849d55fc6d000b14b047682af01013ad937ec44fc",
+      "size_bytes": 9988
+    },
+    {
+      "path": "src/ftd_prediction/rna.py",
+      "sha256": "d2b6293cba6afcb5acd2aec2392b8b446e47825e1c11050dd5e4ec02474f5e3e",
+      "size_bytes": 3042
+    },
+    {
+      "path": "src/ftd_prediction/rna_training.py",
+      "sha256": "f77b376b811312527add71cc2ddeace7be0b33fb64f6a9f81845ea0bc2a13616",
+      "size_bytes": 27152
+    },
+    {
+      "path": "src/ftd_prediction/spatial.py",
+      "sha256": "b18f208dcebb64172d83f58d79364fa299cf274d5e22eb38c6269e53899b0f3f",
+      "size_bytes": 18549
+    },
+    {
+      "path": "src/ftd_prediction/spatial_training.py",
+      "sha256": "d2254da7d78b66fb0b6bc025e53e7cb514579bd952155e18bd276ea26eda2f5f",
+      "size_bytes": 33743
+    },
+    {
+      "path": "src/ftd_prediction/synthetic.py",
+      "sha256": "4699beb9021a0cf2e19600b00c9096bdb036fd11e6b5b5e4de51a89179e38d71",
+      "size_bytes": 4373
+    },
+    {
+      "path": "tests/test_cluster.py",
+      "sha256": "0dbe9ee743f89abc0345c950ac721825b1f430c25cc6233fbfdc95535ca500a2",
+      "size_bytes": 9356
+    },
+    {
+      "path": "tests/test_contracts.py",
+      "sha256": "a1751df7e13a816d5f613e318a7c6fda5ff5c349921bf2ea251ec19fca370057",
+      "size_bytes": 6720
+    },
+    {
+      "path": "tests/test_data.py",
+      "sha256": "becbb89b18fa2d699d36b91def709c2bf12f05c5bafd9c4c5deb320108e39ad1",
+      "size_bytes": 10245
+    },
+    {
+      "path": "tests/test_descriptive.py",
+      "sha256": "9036a6de23e286d312e052f86dc18f77374686c3367a5699ae5f6b0685ae93cf",
+      "size_bytes": 23874
+    },
+    {
+      "path": "tests/test_descriptive_report.py",
+      "sha256": "83f82d1ecfaca0626fa0a9ddb048a8e0bdc239c93f48e4b59b2a6bd07dea33cd",
+      "size_bytes": 20098
+    },
+    {
+      "path": "tests/test_format_inventory.py",
+      "sha256": "ed686a4c25a65446fd3df538ec1265efaf79a08f64cb440eb52996bc5e61f48d",
+      "size_bytes": 11579
+    },
+    {
+      "path": "tests/test_h5ad_io.py",
+      "sha256": "b6a7dc0a687733ca5962e1502de94f7c575be7400066318d11d9949a6cb3743f",
+      "size_bytes": 13695
+    },
+    {
+      "path": "tests/test_inline_counts_probe.py",
+      "sha256": "aa5f0fc11727b6ae89e43a493a4be6ded2c3b1e7b62cff2b3555e1c4506062dc",
+      "size_bytes": 4758
+    },
+    {
+      "path": "tests/test_molecular.py",
+      "sha256": "6315cec7c08780a49913dd655cde84e38d6adc2ac9ec1ff305a2dbf81946a37c",
+      "size_bytes": 28024
+    },
+    {
+      "path": "tests/test_neural_report.py",
+      "sha256": "ce37e7d58bdba95a783ebd66c5c8baf2abfa97708990ca710babea026b85dea7",
+      "size_bytes": 9313
+    },
+    {
+      "path": "tests/test_neural_runner.py",
+      "sha256": "3c2007369f3f15a355d837f3485f74fd8a9147f682faca2554186cb8c80273aa",
+      "size_bytes": 12355
+    },
+    {
+      "path": "tests/test_novae_checkpoint.py",
+      "sha256": "a388246ad34e446351f617fa11395272c8e3a1b83fcbcbdc26a489a44fbaa05e",
+      "size_bytes": 13712
+    },
+    {
+      "path": "tests/test_pmacs_discovery.py",
+      "sha256": "bdd9818ab688b30a86a8492c39889d6c5bc32af6ff47c9aa771b775619c6358b",
+      "size_bytes": 16827
+    },
+    {
+      "path": "tests/test_pmacs_ready.py",
+      "sha256": "d102014ca4e9e16890faeb6c2b44a1ec893ddd1710cacf9146f02651f45cc593",
+      "size_bytes": 21563
+    },
+    {
+      "path": "tests/test_reference.py",
+      "sha256": "b7e8fa7d542e4f3a30aa4130781cd03b14231e1d327da6f4e059a1bcdcdc3565",
+      "size_bytes": 9558
+    },
+    {
+      "path": "tests/test_rna.py",
+      "sha256": "a0c24f9ebc4825d374492bf1ded2f7e95326a9fcda3ad63a1912ff592d68c7f8",
+      "size_bytes": 6481
+    },
+    {
+      "path": "tests/test_rna_training.py",
+      "sha256": "8729538dee02c37e007c62644fe6974b87b97686cd505214139c0ba6f9a3841a",
+      "size_bytes": 16895
+    },
+    {
+      "path": "tests/test_rna_training_acceptance.py",
+      "sha256": "0ea289104a475569df46e30418e845768795ef83f9678e73c35d9cd70733c2a0",
+      "size_bytes": 3112
+    },
+    {
+      "path": "tests/test_runner.py",
+      "sha256": "528e6a5e6543ceee3157e15a1d142a60e701c05b3f269b83bd9e2a4dee89d0e6",
+      "size_bytes": 15198
+    },
+    {
+      "path": "tests/test_spatial.py",
+      "sha256": "91dc698fdc819815740957e9dd5482da2128ad66fc35613051148206e0a8e041",
+      "size_bytes": 11664
+    },
+    {
+      "path": "tests/test_spatial_training.py",
+      "sha256": "cd396d11e70d0c6c63ea8ca9205ef6a3ada13c6e15e997ff169a8b81cf23f8a7",
+      "size_bytes": 20244
+    },
+    {
+      "path": "tests/test_spatial_training_acceptance.py",
+      "sha256": "4355525d1643d43c10450b249c40dd9ab117cb23b291e019ab903425270bd20b",
+      "size_bytes": 3294
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "data_kind": "study",
+  "assay": "rna",
+  "source_run_dir": "/REPLACE_WITH_PRIVATE_COMPLETED_DESCRIPTIVE_RUN",
+  "source_run_sha256": "REPLACE_WITH_EXACT_SHA256_OF_PROVENANCE_RUN_JSON",
+  "source_annotation_evidence_ref": "REPLACE_WITH_VERIFIED_ANNOTATION_RECORD",
+  "feature_universe_evidence_ref": "REPLACE_WITH_VERIFIED_ENDOGENOUS_FEATURE_RECORD",
+  "all_features_endogenous_verified": false,
+  "contrasts": [
+    {
+      "contrast_id": "REPLACE_WITH_PRESPECIFIED_CONTRAST_ID",
+      "case_donor_id": "REPLACE_WITH_EXPLICITLY_VERIFIED_CASE_ID",
+      "reference_donor_ids": ["REPLACE_WITH_EXPLICITLY_VERIFIED_REFERENCE_ID"],
+      "retinal_region": "REPLACE_WITH_EXACT_COMPARABLE_REGION",
+      "cell_type": "REPLACE_WITH_EXACT_VERIFIED_ANNOTATION",
+      "label_evidence_ref": "REPLACE_WITH_VERIFIED_LABEL_RECORD",
+      "matching_evidence_ref": "REPLACE_WITH_REGION_CELLTYPE_MATCHING_RECORD"
+    }
+  ]
+}

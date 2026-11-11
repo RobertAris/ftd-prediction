@@ -9,6 +9,24 @@ import hashlib
 from pathlib import Path
 
 
+_UNRESOLVED_IDENTITIES = {
+    '', 'unknown', 'unresolved', 'null', 'none', 'nan', 'na', 'unavailable',
+    '__unavailable__', 'conflicting', 'not_applicable', 'restricted',
+}
+
+
+def allowed_count_kinds(assay):
+    """Keep count provenance explicit across sequencing and imaging assays.
+
+    Spatial sequencing fixtures can retain UMI provenance. Xenium uses decoded
+    transcript counts and must record ``measured_transcripts`` instead.
+    """
+    kinds = {'measured_umi', 'background_corrected_umi'}
+    if assay == 'spatial':
+        kinds.add('measured_transcripts')
+    return kinds
+
+
 def _text(value):
     return value.decode('utf-8') if isinstance(value, bytes) else str(value)
 
@@ -112,7 +130,7 @@ def _apply_mapping(frame, config):
     mapping = pd.read_csv(path, dtype=str, keep_default_na=False, nrows=100001)
     targets = set(mapping.columns) - set(keys)
     if (len(mapping) > 100000 or not targets or not set(keys).issubset(mapping.columns)
-            or targets - {'donor_id', 'section_id', 'tissue_component'}
+            or targets - {'donor_id', 'section_id', 'retinal_region', 'tissue_component'}
             or targets & set(frame.columns)):
         raise ValueError('Mapping columns are missing, unsupported or would replace existing columns')
     for column in mapping:
@@ -153,7 +171,7 @@ def load_h5ad(path, config):
     ):
         raise ValueError('An explicit X, raw/X or exact layers/name count source is required')
     provenance = config.get('counts_provenance', {})
-    if provenance.get('kind') not in ('measured_umi', 'background_corrected_umi') or not provenance.get('evidence_ref'):
+    if provenance.get('kind') not in allowed_count_kinds(config.get('assay')) or not provenance.get('evidence_ref'):
         raise ValueError('Verified unnormalized count provenance is required')
     if config.get('mapping_verified') is not True or not config.get('mapping_evidence_ref'):
         raise ValueError('Verified donor/section mapping evidence is required')
@@ -203,7 +221,8 @@ def load_h5ad(path, config):
             if required not in frame:
                 raise ValueError('Biological mapping is incomplete')
             values = frame[required]
-            if values.isna().any() or values.astype(str).str.strip().isin(['', 'unknown', 'unresolved', 'nan', 'None']).any():
+            if (values.isna().any()
+                    or values.astype(str).str.strip().str.casefold().isin(_UNRESOLVED_IDENTITIES).any()):
                 raise ValueError('Required biological mapping contains unresolved values')
             frame[required] = values.astype(str)
         if spatial and frame.groupby('section_id', observed=True)['donor_id'].nunique().gt(1).any():

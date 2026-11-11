@@ -12,7 +12,7 @@ class ClusterConfigError(ValueError):
     pass
 
 
-_PLACEHOLDER = re.compile(r"replace|placeholder|<|>|your[_ -]|example", re.IGNORECASE)
+_PLACEHOLDER = re.compile(r"replace|unverified|placeholder|<|>|your[_ -]|example", re.IGNORECASE)
 _IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 _PATH = re.compile(r"^/[A-Za-z0-9_./-]+$")
 _RESOURCE = re.compile(r"^[A-Za-z0-9_\[\]=:.,+*/()!&| -]+$")
@@ -35,6 +35,89 @@ def _path(value: object, field: str) -> Path:
 
 def _within(path: Path, root: Path) -> bool:
     return path == root or root in path.parents
+
+
+def _command(config: dict, run: Path, python: Path) -> list[str]:
+    module = config.get("module", "ftd_prediction")
+    schemas = {
+        "ftd_prediction": {
+            "preflight": ({"--output", "--config", "--seed"}, {"--output"}),
+            "pilot": ({"--output", "--config", "--seed", "--manifest", "--mode",
+                       "--execution-context", "--canonical-input-root"}, {"--output", "--manifest"}),
+            "validate": ({"--manifest"}, {"--manifest"}),
+            "report": ({"--run", "--output", "--format"}, {"--run", "--output"}),
+        },
+        "ftd_prediction.descriptive": None,
+        "ftd_prediction.neural": None,
+        "ftd_prediction.neural_report": None,
+        "ftd_prediction.descriptive_report": None,
+        "ftd_prediction.molecular": None,
+    }
+    if not isinstance(module, str) or module not in schemas:
+        raise ClusterConfigError("unsupported module")
+    arguments = config.get("arguments")
+    if not isinstance(arguments, list) or not arguments or not all(isinstance(v, str) for v in arguments):
+        raise ClusterConfigError("arguments must be a nonempty string list")
+    for item in arguments:
+        _text(item, "arguments")
+        if any(token in item for token in ("$(", "${", "`", ";", "|", "&")):
+            raise ClusterConfigError("arguments contain shell-control syntax")
+    if module == "ftd_prediction":
+        if arguments[0] not in schemas[module]:
+            raise ClusterConfigError("only reviewed pipeline subcommands can be rendered")
+        allowed, required = schemas[module][arguments[0]]
+        options = arguments[1:]
+    elif module in {"ftd_prediction.neural_report", "ftd_prediction.descriptive_report"}:
+        allowed = required = {"--run", "--output"}
+        options = arguments
+    else:
+        allowed = {"--config", "--output", "--mode", "--execution-context"}
+        required = {"--config", "--output"}
+        options = arguments
+    values = {}
+    index = 0
+    while index < len(options):
+        flag, equal, value = options[index].partition("=")
+        if flag not in allowed:
+            raise ClusterConfigError("unknown or abbreviated option")
+        if not equal:
+            index += 1
+            if index == len(options):
+                raise ClusterConfigError("option value is missing")
+            value = options[index]
+        if not value or value.startswith("-"):
+            raise ClusterConfigError("option value is missing or unsafe")
+        repeatable = {"--canonical-input-root"}
+        if module in {"ftd_prediction", "ftd_prediction.neural_report"}:
+            repeatable.add("--run")
+        if flag in values and flag not in repeatable:
+            raise ClusterConfigError("duplicate option")
+        values.setdefault(flag, []).append(value)
+        if flag in {"--output", "--config", "--manifest", "--run", "--canonical-input-root"}:
+            if flag == "--output" or value.startswith("/") or module != "ftd_prediction":
+                _path(value, flag)
+            elif not re.fullmatch(r"[A-Za-z0-9_./-]+", value) or ".." in Path(value).parts:
+                raise ClusterConfigError("input option must be a plain path")
+        elif flag == "--seed" and not re.fullmatch(r"[0-9]+", value):
+            raise ClusterConfigError("seed must be a nonnegative integer")
+        elif flag == "--mode":
+            modes = ({"study", "synthetic"} if module in {
+                "ftd_prediction.descriptive", "ftd_prediction.molecular"}
+                else {"study", "reference", "synthetic"})
+            if value not in modes:
+                raise ClusterConfigError("unsupported execution mode")
+        elif flag == "--execution-context" and value not in {"pmacs", "local"}:
+            raise ClusterConfigError("unsupported execution context")
+        elif flag == "--format" and value not in {"markdown", "html"}:
+            raise ClusterConfigError("unsupported report format")
+        index += 1
+    if required - values.keys():
+        raise ClusterConfigError("required command options are missing")
+    if "--output" in values:
+        output = _path(values["--output"][0], "command output")
+        if output == run or not _within(output, run):
+            raise ClusterConfigError("command output must be a new child of the configured personal run directory")
+    return [str(python), "-m", module, *arguments]
 
 
 def render_lsf_text(config: dict) -> str:
@@ -79,34 +162,7 @@ def render_lsf_text(config: dict) -> str:
                 raise ClusterConfigError("resource_expression is unbalanced")
         if depth:
             raise ClusterConfigError("resource_expression is unbalanced")
-    arguments = config.get("arguments")
-    if not isinstance(arguments, list) or not arguments or not all(isinstance(item, str) for item in arguments):
-        raise ClusterConfigError("arguments must be a nonempty string list")
-    if arguments[0] not in {"preflight", "pilot", "validate", "report"}:
-        raise ClusterConfigError("only reviewed pipeline subcommands can be rendered")
-    for item in arguments:
-        _text(item, "arguments")
-        if any(token in item for token in ("$(", "${", "`", ";", "|", "&")):
-            raise ClusterConfigError("arguments contain shell-control syntax")
-    output_values = []
-    for index, item in enumerate(arguments[1:], start=1):
-        if item == "--output":
-            if index + 1 >= len(arguments):
-                raise ClusterConfigError("command output value is missing")
-            output_values.append(arguments[index + 1])
-        elif item.startswith("--output="):
-            output_values.append(item.split("=", 1)[1])
-        elif item.startswith("--out"):
-            raise ClusterConfigError("abbreviated or ambiguous output options are not accepted")
-    if arguments[0] in {"preflight", "pilot", "report"}:
-        if len(output_values) != 1:
-            raise ClusterConfigError("command must declare exactly one output option")
-        actual_output = _path(output_values[0], "command output")
-        if actual_output == run or not _within(actual_output, run):
-            raise ClusterConfigError("command output must be a new child of the configured personal run directory")
-    elif output_values:
-        raise ClusterConfigError("metadata validation does not accept an output option")
-    command = [str(python), "-m", "ftd_prediction", *arguments]
+    command = _command(config, run, python)
     return "\n".join([
         "#!/bin/bash",
         "# Generated request only. Verify cluster configuration before submission.",
@@ -116,6 +172,8 @@ def render_lsf_text(config: dict) -> str:
         f"#BSUB -o {run}/%J.out", f"#BSUB -e {run}/%J.err", "",
         "set -euo pipefail", "umask 077", f"cd {shlex.quote(str(code))}",
         f"export PYTHONPATH={shlex.quote(str(code / 'src'))}",
+        "export PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1",
+        f"export OMP_NUM_THREADS={cpus} OPENBLAS_NUM_THREADS={cpus} MKL_NUM_THREADS={cpus} NUMEXPR_NUM_THREADS={cpus}",
         "exec " + shlex.join(command), "",
     ])
 

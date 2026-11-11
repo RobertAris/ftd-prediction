@@ -126,6 +126,21 @@ class SpatialValidationTests(unittest.TestCase):
             self.reject(cfg={**config(), "mode": mode,
                              "checkpoint_path": "prism-oncology/novae-human-0"})
 
+    def test_checkpoint_compatibility_is_explicit_and_expression_only(self):
+        from ftd_prediction.novae_checkpoint import COMPATIBILITY
+        from ftd_prediction.spatial_training import _validate
+        cfg, _, _ = _validate(fixture(), config())
+        self.assertEqual(cfg["checkpoint_compatibility"], "strict")
+        for mode in (None, False, "auto", "permissive", "novae-human-0"):
+            with self.subTest(mode=mode):
+                self.reject(cfg={**config(), "checkpoint_compatibility": mode})
+        self.reject(cfg={**config(), "checkpoint_compatibility": COMPATIBILITY})
+        import numpy as np
+        a = fixture()
+        a.obsm["histo_embeddings"] = np.zeros((a.n_obs, 50))
+        # This must fail before any artifact or stripped-down section is made.
+        self.reject(a, {**config(), "mode": "frozen", "checkpoint_compatibility": COMPATIBILITY})
+
     def test_features_and_baseline_do_not_fit_holdout(self):
         import numpy as np
         from scipy.sparse import csr_matrix
@@ -346,6 +361,8 @@ class SpatialNeuralTests(unittest.TestCase):
                                         "checkpoint_path": str(broken)}, Path(root) / (mismatch + "_run"))
             for res, out in ((result, output), (frozen, Path(root) / "frozen")):
                 json.dumps(res, allow_nan=False)
+                self.assertIsNone(res["checkpoint_compatibility"])
+                self.assertIsNone(json.loads((out / "provenance.json").read_text())["checkpoint_compatibility"])
                 for relative in res["artifacts"].values():
                     path = (out / relative).resolve()
                     self.assertTrue(path.is_relative_to(out.resolve()))

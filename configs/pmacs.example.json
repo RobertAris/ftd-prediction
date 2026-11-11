@@ -1,0 +1,22 @@
+{
+  "workspace": "/project/hipaa_ycheng11lab/REPLACE_PROJECT/REPLACE_PENNKEY",
+  "code_directory": "/project/hipaa_ycheng11lab/REPLACE_PROJECT/REPLACE_PENNKEY/code",
+  "python_executable": "/project/hipaa_ycheng11lab/REPLACE_PROJECT/REPLACE_PENNKEY/virtual_environments/ftd/bin/python",
+  "run_directory": "/project/hipaa_ycheng11lab/REPLACE_PROJECT/REPLACE_PENNKEY/runs/REPLACE_UNIQUE_RUN",
+  "queue": "REPLACE_APPROVED_QUEUE",
+  "job_name": "ftd_preflight",
+  "cpu_slots": 4,
+  "wall_time": "01:00",
+  "memory_semantics_verified": false,
+  "run_directory_precreated": false,
+  "memory_units": "REPLACE_VERIFIED_UNITS",
+  "memory_scope": "REPLACE_per_job_OR_per_slot",
+  "resource_expression": "REPLACE_VERIFIED_LSF_MEMORY_AND_PLACEMENT_EXPRESSION",
+  "arguments": [
+    "preflight",
+    "--output",
+    "/project/hipaa_ycheng11lab/REPLACE_PROJECT/REPLACE_PENNKEY/runs/REPLACE_UNIQUE_RUN/artifacts",
+    "--seed",
+    "11"
+  ]
+}
