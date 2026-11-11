@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "data_kind": "study",
+  "assay": "rna",
+  "input_file": "/REPLACE_WITH_APPROVED_CANONICAL_FILE.h5ad",
+  "canonical_input_roots": [
+    "/REPLACE_WITH_APPROVED_CANONICAL_ROOT",
+    "/REPLACE_WITH_PRIVATE_MAPPING_DIRECTORY"
+  ],
+  "count_source": "layers/REPLACE_WITH_VERIFIED_COUNTS_LAYER",
+  "counts_provenance": {
+    "kind": "measured_umi",
+    "evidence_ref": "REPLACE_WITH_LOCAL_PREPROCESSING_RECORD"
+  },
+  "mapping_verified": false,
+  "mapping_evidence_ref": "",
+  "obs_columns": {
+    "sample_id": "sample",
+    "cell_type": "majorclass",
+    "retinal_region": "tissue_region"
+  },
+  "shared_preprocessing_scope": "unverified",
+  "source_version": "REPLACE_WITH_PREPROCESSING_VERSION",
+  "seed": 11,
+  "max_source_cells": 2000000,
+  "max_cells": 500000,
+  "max_genes": 100000,
+  "max_matrix_bytes": 4294967296,
+  "split_strategy": "leave_one_donor_out",
+  "model": {
+    "seed": 11,
+    "max_epochs": 100,
+    "max_minutes": 60,
+    "max_genes": 2000,
+    "n_hidden": 128,
+    "n_latent": 16,
+    "n_layers": 2,
+    "batch_size": 256,
+    "learning_rate": 0.001,
+    "weight_decay": 1e-06,
+    "kl_warmup_epochs": 20,
+    "accelerator": "cpu",
+    "num_threads": 1
+  },
+  "mapping_file": "/REPLACE_WITH_PRIVATE_MAPPING_DIRECTORY/verified_mapping.csv",
+  "mapping_keys": [
+    "sample_id"
+  ]
+}

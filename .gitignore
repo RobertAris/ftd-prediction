@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv*/
+*.local.json
+*.local.csv
+runs/
+outputs/
+data/
+checkpoints/
+*.h5ad
+*.h5
+*.rds
+*.pt
+*.safetensors
